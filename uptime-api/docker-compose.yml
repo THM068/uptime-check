@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  postgres:
+    image: "postgres"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: uptime_api
+      POSTGRES_USER: uptime_api
+      POSTGRES_DB: uptime_api
+    ports:
+      - 5432:5432
+  postgres_test:
+    image: "postgres"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: uptime_api_test
+      POSTGRES_USER: uptime_api_test
+      POSTGRES_DB: uptime_api_test
+    ports:
+      - 5433:5432
