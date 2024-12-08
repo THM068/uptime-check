@@ -48,6 +48,8 @@ pub enum Error {
     /// returning `None`.
     #[error("no record found")]
     NoRecordFound,
+    #[error("record already exists")]
+    RecordAlreadyExists,
     #[error("validation failed")]
     /// An invalid changeset was passed to a writing operation such as creating or updating a record.
     ValidationError(#[from] validator::ValidationErrors),

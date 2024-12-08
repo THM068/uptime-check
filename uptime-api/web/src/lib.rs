@@ -37,7 +37,8 @@ pub async fn run() -> anyhow::Result<()> {
 
     let addr = config.server.addr();
     let listener = TcpListener::bind(&addr).await?;
-    info!("Listening on {}", &addr);
+
+    info!("Listening on port http://{}", &addr);
     serve(listener, app.into_make_service()).await?;
 
     Ok(())

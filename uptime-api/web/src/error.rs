@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, response::IntoResponse};
+use axum::{http::StatusCode, response::IntoResponse, Json};
 use std::fmt::{Debug, Display};
 
 /// Error type that encapsultes anything that can go wrong
@@ -25,6 +25,13 @@ impl IntoResponse for Error {
             }
             Error::Database(uptime_api_db::Error::DbError(e)) => internal_error(e).into_response(),
             Error::Other(e) => internal_error(e).into_response(),
+            Error::Database(uptime_api_db::Error::RecordAlreadyExists) => (
+                StatusCode::BAD_REQUEST,
+                Json(Error_Messages {
+                    error: "Record already exists".to_string(),
+                }),
+            )
+                .into_response(),
         }
     }
 }
@@ -49,4 +56,8 @@ where
 fn validation_error(e: validator::ValidationErrors) -> (StatusCode, String) {
     tracing::info!(err.msg = %e, err.details = ?e, "Validation failed");
     (StatusCode::UNPROCESSABLE_ENTITY, e.to_string())
+}
+#[derive(Debug, serde::Serialize)]
+pub struct Error_Messages {
+    pub error: String,
 }
