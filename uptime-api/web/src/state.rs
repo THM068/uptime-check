@@ -6,6 +6,7 @@ use uptime_api_db::{connect_pool, DbPool};
 pub struct AppState {
     /// The database pool that's used to get a connection to the application's database (see [`uptime_api_db::DbPool`]).
     pub db_pool: DbPool,
+    pub jwt_secret: String,
 }
 
 /// The application's state as it is shared across the application, e.g. in controllers and middlewares.
@@ -22,5 +23,8 @@ pub async fn init_app_state(config: Config) -> AppState {
         .await
         .expect("Could not connect to database!");
 
-    AppState { db_pool }
+    AppState {
+        db_pool: db_pool,
+        jwt_secret: config.jwt.secret,
+    }
 }

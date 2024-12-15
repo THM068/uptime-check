@@ -1,8 +1,10 @@
 use crate::{error::Error, state::SharedAppState};
-use axum::{extract::Path, extract::State, http::StatusCode, routing, Json, Router};
+use axum::{extract::Path, extract::State, http::StatusCode, routing, Json, Router, middleware, Extension};
 use tracing::info;
 use uptime_api_db::entities;
 use uuid::Uuid;
+use uptime_api_db::entities::users::User;
+use crate::middlewares::validate_jwt::validate_jwt;
 
 pub fn user_routes(shared_state: SharedAppState) -> Router {
     #[axum::debug_handler]
@@ -27,7 +29,9 @@ pub fn user_routes(shared_state: SharedAppState) -> Router {
     #[axum::debug_handler]
     pub async fn read_all(
         State(app_state): State<SharedAppState>,
+        Extension(currentUser): Extension<User>
     ) -> Result<Json<Vec<entities::users::User>>, Error> {
+        info!("Current user: {:?}", currentUser);
         let users = entities::users::load_all(&app_state.db_pool).await?;
 
         info!("responding with {:?}", users);
@@ -76,10 +80,10 @@ pub fn user_routes(shared_state: SharedAppState) -> Router {
     }
 
     Router::new()
-        .route("/", routing::post(create))
-        .route("/", routing::get(read_all))
-        .route("/:id", routing::get(read_one))
+        .route("/users", routing::post(create))
+        .route("/users", routing::get(read_all).layer(middleware::from_fn_with_state(shared_state.clone(),validate_jwt)))
+        .route("/users/:id", routing::get(read_one))
         .route("/:id", routing::put(update))
-        .route("/:id", routing::delete(delete))
+        .route("/users/:id", routing::delete(delete))
         .with_state(shared_state)
 }

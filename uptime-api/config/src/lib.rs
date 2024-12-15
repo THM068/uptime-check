@@ -23,7 +23,7 @@ pub struct Config {
     pub server: ServerConfig,
     /// the database configuration: [`DatabaseConfig`]
     pub database: DatabaseConfig,
-    // add your config settings here…
+    pub jwt: JwtConfig,
 }
 
 /// The server configuration.
@@ -95,6 +95,12 @@ impl ServerConfig {
 pub struct DatabaseConfig {
     /// The URL to use to connect to the database, e.g. "postgresql://user:password@localhost:5432/database"
     pub url: String,
+}
+
+#[derive(Deserialize, Clone, Debug)]
+#[cfg_attr(test, derive(PartialEq))]
+pub struct JwtConfig {
+    pub secret: String
 }
 
 /// Loads the application configuration for a particular environment.

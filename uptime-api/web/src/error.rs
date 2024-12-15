@@ -1,5 +1,6 @@
 use axum::{http::StatusCode, response::IntoResponse, Json};
 use std::fmt::{Debug, Display};
+use crate::controllers::error::Error::{UserNotFound, UserPasswordNotMatch};
 
 /// Error type that encapsultes anything that can go wrong
 /// in this application. Implements [IntoResponse],
@@ -9,6 +10,8 @@ pub enum Error {
     /// Errors that can occur as a result of a data layer operation.
     #[error("Database error")]
     Database(#[from] uptime_api_db::Error),
+    #[error("Web error")]
+    SIGNIN(#[from] crate::controllers::error::Error),
     /// Any other error. Handled as an Internal Server Error.
     #[error("Error: {0}")]
     Other(#[from] anyhow::Error),
@@ -32,6 +35,15 @@ impl IntoResponse for Error {
                 }),
             )
                 .into_response(),
+            Error::SIGNIN(UserNotFound) | Error::SIGNIN(UserPasswordNotMatch)=> {
+                (
+                    StatusCode::UNAUTHORIZED,
+                    Json(Error_Messages {
+                        error: "Username or password invalid".to_string(),
+                    }),
+                )
+                    .into_response()
+            }
         }
     }
 }

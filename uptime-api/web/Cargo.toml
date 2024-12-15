@@ -30,6 +30,7 @@ hyper = { version = "1.0", features = ["full"], optional = true }
 validator = "0.19"
 bcrypt = "0.15.1"
 uptime-api-macros = { path = "../macros", optional = true }
+jsonwebtoken = "8.2.0"
 
 [dev-dependencies]
 fake = "3.0"

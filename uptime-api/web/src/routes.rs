@@ -1,9 +1,10 @@
-use crate::state::AppState;
+use std::sync::Arc;
+
 use axum::Router;
 
+use crate::controllers::authentication::authentication_routes;
 use crate::controllers::users::user_routes;
-use std::sync::Arc;
-use tower_http::services::ServeDir;
+use crate::state::AppState;
 
 /// Initializes the application's routes.
 ///
@@ -11,5 +12,7 @@ use tower_http::services::ServeDir;
 pub fn init_routes(app_state: AppState) -> Router {
     let shared_app_state = Arc::new(app_state);
 
-    Router::new().nest_service("/users", user_routes(Arc::clone(&shared_app_state)))
+    Router::new()
+        .nest("/api", user_routes(Arc::clone(&shared_app_state)))
+        .nest("/api", authentication_routes(Arc::clone(&shared_app_state)))
 }

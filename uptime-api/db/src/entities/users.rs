@@ -8,7 +8,7 @@ use sqlx::Postgres;
 use uuid::Uuid;
 use validator::Validate;
 
-#[derive(Serialize, Debug, Deserialize)]
+#[derive(Serialize, Debug, Deserialize, Clone)]
 pub struct User {
     // these are examples only
     pub id: Uuid,
